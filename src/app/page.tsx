@@ -18,53 +18,55 @@ export default function CosmicClockPage() {
   useEffect(() => {
     setIsMounted(true);
 
-    const fetchLocationData = async (latitude: number, longitude: number) => {
-      try {
-        const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&accept-language=en`);
-        if (!response.ok) throw new Error("API call failed");
-        const data = await response.json();
-        
-        const city = data.address.city || data.address.town || data.address.village || 'Unknown Area';
-        const country = data.address.country || 'Unknown Country';
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-        setLocationInfo({
-          city,
-          country,
-          timezone,
-          subtitle: "Based on your browser location",
-        });
-      } catch (e) {
+    // Only run geolocation on client after mount
+    if (typeof window !== "undefined") {
+      // Show a loading state until user responds
+      setLocationInfo(null);
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const fetchLocationData = async (latitude: number, longitude: number) => {
+              try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&accept-language=en`);
+                if (!response.ok) throw new Error("API call failed");
+                const data = await response.json();
+                const city = data.address.city || data.address.town || data.address.village || 'Unknown Area';
+                const country = data.address.country || 'Unknown Country';
+                const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+                setLocationInfo({
+                  city,
+                  country,
+                  timezone,
+                  subtitle: "Based on your browser location",
+                });
+              } catch (e) {
+                setLocationInfo({
+                  city: "Varanasi",
+                  country: "India",
+                  timezone: "Asia/Kolkata",
+                  subtitle: "Could not detect location",
+                });
+              }
+            };
+            fetchLocationData(position.coords.latitude, position.coords.longitude);
+          },
+          () => {
+            setLocationInfo({
+              city: "Varanasi",
+              country: "India",
+              timezone: "Asia/Kolkata",
+              subtitle: "Location access denied",
+            });
+          }
+        );
+      } else {
         setLocationInfo({
           city: "Varanasi",
           country: "India",
           timezone: "Asia/Kolkata",
-          subtitle: "Could not detect location",
+          subtitle: "Geolocation not supported",
         });
       }
-    };
-    
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          fetchLocationData(position.coords.latitude, position.coords.longitude);
-        },
-        () => {
-          setLocationInfo({
-            city: "Varanasi",
-            country: "India",
-            timezone: "Asia/Kolkata",
-            subtitle: "Location access denied",
-          });
-        }
-      );
-    } else {
-      setLocationInfo({
-        city: "Varanasi",
-        country: "India",
-        timezone: "Asia/Kolkata",
-        subtitle: "Geolocation not supported",
-      });
     }
     
     const initialDate = new Date();
