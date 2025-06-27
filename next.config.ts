@@ -3,6 +3,7 @@ import withPWA from '@ducanh2912/next-pwa';
 
 const nextConfig: NextConfig = {
   /* config options here */
+  output: 'export', // Enable static export for Next.js 14+
   typescript: {
     ignoreBuildErrors: true,
   },
