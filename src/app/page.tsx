@@ -213,6 +213,9 @@ export default function CosmicClockPage() {
     <main className="min-h-screen w-full bg-background p-4 sm:p-6 lg:p-8">
       <header className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold text-accent font-headline">Cosmic Clock</h1>
+        <Button variant="outline" onClick={() => setManualMode(true)}>
+          Change Location
+        </Button>
       </header>
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 lg:items-start">
         <div className="lg:col-span-2 space-y-8">
@@ -223,6 +226,37 @@ export default function CosmicClockPage() {
            <UpcomingNakshatrasList upcomingNakshatras={upcomingNakshatras} now={now} />
         </div>
       </div>
+      {/* Manual location select UI (always available) */}
+      {manualMode && (
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-lg w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4">Select your location</h2>
+            <Button className="mb-2 w-full" variant="outline" onClick={handleAutoDetect}>
+              Auto-detect my location
+            </Button>
+            <Input
+              placeholder="Type city, place, or country..."
+              value={searchTerm}
+              onChange={e => setSearchTerm(e.target.value)}
+              className="mb-2"
+            />
+            {searchLoading && <div className="text-sm text-muted-foreground">Loading...</div>}
+            <ul className="max-h-48 overflow-y-auto divide-y divide-muted-foreground/10">
+              {searchResults.map((result, idx) => (
+                <li key={idx} className="py-2 cursor-pointer hover:bg-accent/10 px-2 rounded" onClick={() => handleManualSelect(result)}>
+                  <div className="font-semibold">{result.display_name}</div>
+                </li>
+              ))}
+              {searchResults.length === 0 && searchTerm.length > 2 && !searchLoading && (
+                <li className="py-2 text-muted-foreground px-2">No results found.</li>
+              )}
+            </ul>
+            <Button className="mt-4 w-full" variant="ghost" onClick={() => setManualMode(false)}>
+              Cancel
+            </Button>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
