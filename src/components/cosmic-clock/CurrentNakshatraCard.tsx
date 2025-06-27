@@ -11,9 +11,10 @@ import { formatDuration } from '@/lib/astrology';
 type CurrentNakshatraCardProps = {
   now: Date;
   currentNakshatra: NakshatraTime;
+  timezone?: string;
 };
 
-export function CurrentNakshatraCard({ now, currentNakshatra }: CurrentNakshatraCardProps) {
+export function CurrentNakshatraCard({ now, currentNakshatra, timezone }: CurrentNakshatraCardProps) {
   const { sanskritName, englishName, rulingPlanet, deity, symbol, characteristics, startTime, endTime } = currentNakshatra;
   
   const totalDuration = endTime.getTime() - startTime.getTime();
@@ -74,7 +75,7 @@ export function CurrentNakshatraCard({ now, currentNakshatra }: CurrentNakshatra
         <div>
           <p className="text-center text-lg">Ends in: <span className="font-bold text-accent font-mono">{formatDuration(timeRemaining)}</span></p>
           <p className="text-center text-sm text-muted-foreground">
-            On {endTime.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' })} at {endTime.toLocaleTimeString()}
+            On {endTime.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', timeZone: timezone })} at {endTime.toLocaleTimeString(undefined, { timeZone: timezone, hour: '2-digit', minute: '2-digit' })}
           </p>
         </div>
         <Progress value={progress} className="w-full h-2 bg-primary/50 [&>div]:bg-accent" />
