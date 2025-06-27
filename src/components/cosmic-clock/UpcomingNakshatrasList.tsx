@@ -45,8 +45,8 @@ export function UpcomingNakshatrasList({ upcomingNakshatras, now }: UpcomingNaks
               <AccordionItem value={nakshatra.id.toString()} key={nakshatra.id}>
                 <AccordionTrigger className="hover:no-underline">
                   <div className="flex flex-col items-start text-left">
-                    <p className="font-semibold text-base text-foreground">{nakshatra.englishName}</p>
-                    <p className="font-sanskrit text-sm text-muted-foreground">{nakshatra.sanskritName}</p>
+                    <p className="font-sanskrit font-semibold text-base text-foreground">{nakshatra.sanskritName}</p>
+                    <p className="text-sm text-muted-foreground">{nakshatra.englishName}</p>
                     <p className="text-xs text-accent font-mono mt-1">
                       Starts in: {formatDuration(nakshatra.startTime.getTime() - now.getTime())}
                     </p>

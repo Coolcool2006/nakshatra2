@@ -35,10 +35,18 @@ export function getCurrentNakshatra(now: Date): NakshatraTime {
   const startTime = new Date(currentCycleStartTime + nakshatraIndex * NAKSHATRA_DURATION_MS);
   const endTime = new Date(startTime.getTime() + NAKSHATRA_DURATION_MS);
 
+  // Pada calculation
+  const padaDuration = NAKSHATRA_DURATION_MS / 4;
+  const elapsedTimeInNakshatra = now.getTime() - startTime.getTime();
+  const currentPada = Math.floor(elapsedTimeInNakshatra / padaDuration) + 1;
+  const padaEndTime = new Date(startTime.getTime() + currentPada * padaDuration);
+
   return {
     ...currentNakshatraData,
     startTime,
     endTime,
+    currentPada,
+    padaEndTime,
   };
 }
 

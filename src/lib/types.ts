@@ -11,4 +11,6 @@ export interface Nakshatra {
 export interface NakshatraTime extends Nakshatra {
   startTime: Date;
   endTime: Date;
+  currentPada?: number;
+  padaEndTime?: Date;
 }

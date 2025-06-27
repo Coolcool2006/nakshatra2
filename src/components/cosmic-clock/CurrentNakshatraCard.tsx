@@ -5,7 +5,7 @@ import type { NakshatraTime } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Orbit, Sparkles, Milestone, Star } from 'lucide-react';
+import { Orbit, Sparkles, Milestone, Star, LayoutGrid } from 'lucide-react';
 import { formatDuration } from '@/lib/astrology';
 
 type CurrentNakshatraCardProps = {
@@ -15,18 +15,19 @@ type CurrentNakshatraCardProps = {
 };
 
 export function CurrentNakshatraCard({ now, currentNakshatra, timezone }: CurrentNakshatraCardProps) {
-  const { sanskritName, englishName, rulingPlanet, deity, symbol, characteristics, startTime, endTime } = currentNakshatra;
+  const { sanskritName, englishName, rulingPlanet, deity, symbol, characteristics, startTime, endTime, currentPada, padaEndTime } = currentNakshatra;
   
   const totalDuration = endTime.getTime() - startTime.getTime();
   const elapsedTime = now.getTime() - startTime.getTime();
   const progress = Math.min(100, (elapsedTime / totalDuration) * 100);
   const timeRemaining = endTime.getTime() - now.getTime();
+  const padaTimeRemaining = padaEndTime ? padaEndTime.getTime() - now.getTime() : 0;
 
   return (
     <Card className="bg-card/50 backdrop-blur-sm border-primary/20 shadow-lg shadow-primary/10 overflow-hidden">
       <CardHeader className="bg-primary/20">
-        <CardTitle className="text-3xl font-headline text-accent">{englishName}</CardTitle>
-        <CardDescription className="text-xl font-sanskrit text-foreground/80">{sanskritName}</CardDescription>
+        <CardTitle className="text-3xl font-sanskrit font-headline text-accent">{sanskritName}</CardTitle>
+        <CardDescription className="text-xl text-foreground/80">{englishName}</CardDescription>
       </CardHeader>
       <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-4">
@@ -51,6 +52,16 @@ export function CurrentNakshatraCard({ now, currentNakshatra, timezone }: Curren
               <p className="text-muted-foreground">{symbol}</p>
             </div>
           </div>
+          {currentPada && padaEndTime && (
+            <div className="flex items-start gap-4">
+              <LayoutGrid className="h-6 w-6 mt-1 text-accent/80 shrink-0" />
+              <div>
+                <p className="font-semibold text-lg">Pada (Quarter)</p>
+                <p className="text-muted-foreground">Current: {currentPada} of 4</p>
+                <p className="text-muted-foreground text-sm">Next Pada in: {formatDuration(padaTimeRemaining)}</p>
+              </div>
+            </div>
+          )}
         </div>
         <div className="flex flex-col">
             <div className="flex items-start gap-4">
