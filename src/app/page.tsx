@@ -108,11 +108,25 @@ export default function CosmicClockPage() {
   }, [searchTerm, manualMode]);
 
   // Handler for manual location select
-  const handleManualSelect = (result: any) => {
+  const handleManualSelect = async (result: any) => {
+    // Get lat/lon from result
+    const lat = result.lat;
+    const lon = result.lon;
+    // Fetch timezone from TimeZoneDB
+    let timezone = "Asia/Kolkata";
+    try {
+      const tzRes = await fetch(`https://api.timezonedb.com/v2.1/get-time-zone?key=SSVB5OOVGXO2&format=json&by=position&lat=${lat}&lng=${lon}`);
+      const tzData = await tzRes.json();
+      if (tzData.status === "OK") {
+        timezone = tzData.zoneName;
+      }
+    } catch (e) {
+      // fallback to IST
+    }
     setLocationInfo({
       city: result.address.city || result.address.town || result.address.village || result.display_name,
       country: result.address.country || "Unknown Country",
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone, // Could be improved with a timezone API
+      timezone,
       subtitle: result.display_name,
     });
     setManualMode(false);
@@ -124,7 +138,16 @@ export default function CosmicClockPage() {
     setLocationInfo(null);
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
+        async (position) => {
+          // Fetch timezone for detected lat/lon
+          let timezone = "Asia/Kolkata";
+          try {
+            const tzRes = await fetch(`https://api.timezonedb.com/v2.1/get-time-zone?key=SSVB5OOVGXO2&format=json&by=position&lat=${position.coords.latitude}&lng=${position.coords.longitude}`);
+            const tzData = await tzRes.json();
+            if (tzData.status === "OK") {
+              timezone = tzData.zoneName;
+            }
+          } catch (e) {}
           const fetchLocationData = async (latitude: number, longitude: number) => {
             try {
               const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&accept-language=en`);
@@ -132,7 +155,6 @@ export default function CosmicClockPage() {
               const data = await response.json();
               const city = data.address.city || data.address.town || data.address.village || 'Unknown Area';
               const country = data.address.country || 'Unknown Country';
-              const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
               setLocationInfo({
                 city,
                 country,
